@@ -98,6 +98,10 @@ var run = function () {
     // load app code
     _.each(info.load, function (filename) {
       var code = fs.readFileSync(path.join(bundle_dir, filename));
+      // \n is necessary in case final line is a //-comment
+      var wrapped = "(function(__dirname){" + code + "\n})";
+      // See #runInThisContext
+      //
       // it's tempting to run the code in a new context so we can
       // precisely control the enviroment the user code sees. but,
       // this is harder than it looks. you get a situation where []
@@ -110,7 +114,8 @@ var run = function () {
       // runIn[Foo]Context that causes it to print out a descriptive
       // error message on parse error. it's what require() uses to
       // generate its errors.
-      require('vm').runInThisContext(code, filename, true);
+      var func = require('vm').runInThisContext(wrapped, filename, true);
+      func(__dirname);
     });
 
 
