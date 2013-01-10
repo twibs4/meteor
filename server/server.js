@@ -98,8 +98,14 @@ var run = function () {
     // load app code
     _.each(info.load, function (filename) {
       var code = fs.readFileSync(path.join(bundle_dir, filename));
+
+      var requireNpm = function(pkg) {
+        // xcxc is this path stuff a mess? at least explain.
+        var filepath = _.initial(filename.split(path.sep)).join(path.sep);
+        return __meteor_bootstrap__.require(path.join('..', filepath, 'node_modules', pkg));
+      };
       // \n is necessary in case final line is a //-comment
-      var wrapped = "(function(__dirname){" + code + "\n})";
+      var wrapped = "(function(requireNpm){" + code + "\n})";
       // See #runInThisContext
       //
       // it's tempting to run the code in a new context so we can
@@ -115,7 +121,7 @@ var run = function () {
       // error message on parse error. it's what require() uses to
       // generate its errors.
       var func = require('vm').runInThisContext(wrapped, filename, true);
-      func(__dirname);
+      func(requireNpm);
     });
 
 
