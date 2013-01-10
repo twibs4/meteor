@@ -99,8 +99,17 @@ var run = function () {
     _.each(info.load, function (filename) {
       var code = fs.readFileSync(path.join(bundle_dir, filename));
 
+      // XXX ahh, what a mess. even though the npm packages are
+      // correctly placed in node_modules/ relative to the package
+      // source, we can't just use standard `require` because packages
+      // are loaded using runInThisContext (See #runInThisContext)
+      //
+      // (THOUGHT) What are the benefits of using runInThisContext
+      // rather than plain node require?
+      //
+      // (ANSWER?) Perhaps because it allows modifying globals...  Is
+      // that even desirable?
       var requireNpm = function(pkg) {
-        // xcxc is this path stuff a mess? at least explain.
         var filepath = _.initial(filename.split(path.sep)).join(path.sep);
         return __meteor_bootstrap__.require(path.join('..', filepath, 'node_modules', pkg));
       };
