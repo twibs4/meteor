@@ -4,7 +4,7 @@ Package.describe({
 
 Package.on_use(function (api, where) {
   api.add_files('npm.js', 'server');
-  api.useNpm({gcd: '0.0.0', tar: '0.1.0'});
+  api.useNpm({gcd: '0.0.0', tar: '0.1.8'});
 });
 
 Package.on_test(function (api) {
